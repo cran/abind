@@ -1,0 +1,47 @@
+> library(abind)
+> x <- array(1:24,dim=c(2,3,4),dimnames=list(letters[1:2],LETTERS[1:3],letters[23:26]))
+> adrop(x[1,,,drop=FALSE],drop=1)
+  w  x  y  z
+A 1  7 13 19
+B 3  9 15 21
+C 5 11 17 23
+> adrop(x[,1,,drop=FALSE],drop=2)
+  w x  y  z
+a 1 7 13 19
+b 2 8 14 20
+> adrop(x[,,1,drop=FALSE],drop=3)
+  A B C
+a 1 3 5
+b 2 4 6
+> adrop(x[1,1,1,drop=FALSE],drop=1)
+  w
+A 1
+> adrop(x[1,1,1,drop=FALSE],drop=2)
+  w
+a 1
+> adrop(x[1,1,1,drop=FALSE],drop=3)
+  A
+a 1
+> adrop(x[1,1,1,drop=FALSE],drop=1:2)
+w 
+1 
+> adrop(x[1,1,1,drop=FALSE],drop=1:2,one.d=TRUE)
+w 
+1 
+> adrop(x[1,1,1,drop=FALSE],drop=1:2,named=FALSE)
+[1] 1
+> dim(adrop(x[1,1,1,drop=FALSE],drop=1:2,one.d=TRUE))
+[1] 1
+> dimnames(adrop(x[1,1,1,drop=FALSE],drop=1:2,one.d=TRUE))
+[[1]]
+[1] "w"
+
+> names(adrop(x[1,1,1,drop=FALSE],drop=1:2,one.d=TRUE))
+[1] "w"
+> dim(adrop(x[1,1,1,drop=FALSE],drop=1:2))
+NULL
+> dimnames(adrop(x[1,1,1,drop=FALSE],drop=1:2))
+NULL
+> names(adrop(x[1,1,1,drop=FALSE],drop=1:2))
+[1] "w"
+> 

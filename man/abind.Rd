@@ -9,29 +9,40 @@ Combine multi-dimensional arrays.  This is a
  the same or higher dimension.
 }
 \usage{
-abind(..., along=N, new.names=NULL, force.array=TRUE, use.anon.names=TRUE, use.first.dimnames=FALSE)
+abind(..., along=N, rev.along=NULL, new.names=NULL, force.array=TRUE, make.names=use.anon.names, use.anon.names=FALSE, use.first.dimnames=FALSE)
 }
 %- maybe also `usage' for other objects documented here.
 \arguments{
-  \item{\dots}{
-Vectors, arrays, or data frames.  Missing values (\code{NA}s) are
-allowed.  The dimensions of all the arrays must match,
-except on one dimension (specified by \code{along=}).  If these
-arguments are named, the name will be used for the name of
-the dimension along which the arrays are joined.
+  \item{\dots}{ Any number of vectors, matrices, arrays, or data frames.
+The dimensions of all the arrays must match, except on one dimension
+(specified by \code{along=}).  If these arguments are named, the name
+will be used for the name of the dimension along which the arrays are
+joined.  Vectors are treated as having a dim attribute of length one.
+
+Alternatively, there can be one (and only one) list argument supplied,
+whose compenents are the objects to be bound together.  Names of the
+list components are treated in the same way as argument names.
 }
 
-\item{along}{ (optional)
-The dimension along which to bind the arrays.  The default
-is the last dimension, i.e., the maximum length of the
-dim attribute of the supplied arrays.  \code{along=} can take any
+\item{along}{ (optional) The dimension along which to bind the arrays.
+The default is the last dimension, i.e., the maximum length of the dim
+attribute of the supplied arrays.  \code{along=} can take any
 non-negative value up to the minimum length of the dim attribute of
-supplied arrays plus one.  When \code{along=} has a fractional
-value, a value less than 1, or a value greater than N, a new
-dimension is created in the result.  In these cases, the
-dimensions of all arguments must be identical.
+supplied arrays plus one.  When \code{along=} has a fractional value, a
+value less than 1, or a value greater than N (N is the maximum of the
+lengths of the dim attribute of the objects to be bound together), a new
+dimension is created in the result.  In these cases, the dimensions of
+all arguments must be identical.  }
+
+\item{rev.along}{ (optional)
+Alternate way to specify the dimension along which to bind the arrays:
+\code{along = N + 1 - rev.along}.  This is provided mainly to allow easy
+specification of \code{along = N + 1} (by supplying
+\code{rev.along=0}).  If both \code{along} and \code{rev.along} are
+supplied, the supplied value of \code{along} is ignored.
 }
-  \item{new.names}{ (optional)
+
+\item{new.names}{ (optional)
 If new.names is a list, it is the first choice for the
 dimnames attribute of the result.  It should have the same
 structure as a dimnames attribute.  If the names for a
@@ -42,24 +53,30 @@ If \code{new.names} is a character vector, it is used for dimension
 names in the same way as argument names are used.  Zero
 length ("") names are ignored.
 }
-  \item{force.array}{ (optional)
-If false, rbind or cbind are called when possible, i.e., when
-the arguments are all vectors, and along is not 1, or when the
-arguments are vectors or matrices or data frames and along
-is 1 or 2.  If rbind or cbind are used, they will preserve
-the data.frame classes (or any other class that r/cbind
-preserve).  Otherwise, abind will convert objects to class
-array.  Thus, to guarantee that an array object is returned,
-supply the argument \code{force.array=TRUE}.  Note that the use of
-rbind or cbind introduces some subtle changes in the way
-default dimension names are constructed: see the examples
-below.
-}
-  \item{use.anon.names}{ (optional)
-If true, the last resort for dimnames for the along
+  \item{force.array}{ (optional) If \code{FALSE}, rbind or cbind are
+called when possible, i.e., when the arguments are all vectors, and
+along is not 1, or when the arguments are vectors or matrices or data
+frames and along is 1 or 2.  If rbind or cbind are used, they will
+preserve the data.frame classes (or any other class that r/cbind
+preserve).  Otherwise, abind will convert objects to class array.  Thus,
+to guarantee that an array object is returned, supply the argument
+\code{force.array=TRUE}.  Note that the use of rbind or cbind introduces
+some subtle changes in the way default dimension names are constructed:
+see the examples below.  }
+
+\item{make.names}{ (optional)
+If \code{TRUE}, the last resort for dimnames for the along
 dimension will be the deparsed versions of anonymous
 arguments.  This can result in cumbersome names when
 arguments are expressions.
+
+    <p>The default is \code{FALSE}.
+}
+
+
+\item{use.anon.names}{ (optional)
+  \code{use.anon.names}
+is a deprecated synonym for \code{make.names}.
 }
   \item{use.first.dimnames}{ (optional)
     When dimension names are present on more than one
@@ -123,7 +140,7 @@ two-dimensional object.
 
 }
 % \references{ ~put references to the literature/web site here ~ }
-\author{Tony Plate \email{tplate@attglobal.net} and Richard Heiberger }
+\author{Tony Plate \email{tplate@acm.org} and Richard Heiberger }
 % \note{ ~~further notes~~ }
 
 %  ~Make other sections like WARNING with \section{WARNING }{....} ~
@@ -131,16 +148,30 @@ two-dimensional object.
 % \seealso{ ~~objects to SEE ALSO as \code{\link{~~fun~~}}, ~~~ }
 
 \examples{
-# unlike cbind or rbind
+# Five different ways of binding together two matrices
+x <- matrix(1:12,3,4)
+y <- x+100
+dim(abind(x,y,along=0))     # binds on new dimension before first
+dim(abind(x,y,along=1))     # binds on first dimension
+dim(abind(x,y,along=1.5))
+dim(abind(x,y,along=2))
+dim(abind(x,y,along=3))
+dim(abind(x,y,rev.along=1)) # binds on last dimension
+dim(abind(x,y,rev.along=0)) # binds on new dimension after last
+
+# Unlike cbind or rbind in that the default is to bind
+# along the last dimension of the inputs, which for vectors
+# means the result is a vector (because a vector is
+# treated as an array with length(dim(x))==1).
 abind(x=1:4,y=5:8)
-# like cbind
+# Like cbind
 abind(x=1:4,y=5:8,along=2)                   
 abind(x=1:4,matrix(5:20,nrow=4),along=2)
 abind(1:4,matrix(5:20,nrow=4),along=2)
-# like rbind
+# Like rbind
 abind(x=1:4,matrix(5:20,nrow=4),along=1)
 abind(1:4,matrix(5:20,nrow=4),along=1)
-# create a 3-d array out of two matrices
+# Create a 3-d array out of two matrices
 abind(x=matrix(1:16,nrow=4),y=matrix(17:32,nrow=4),along=3)
 }
 \keyword{ manip }% at least one, from doc/KEYWORDS

@@ -1,9 +1,9 @@
 Package: abind
-Version: 1.0-1
-Date: 2003-06-10
+Version: 1.1-0
+Date: 2004-03-12
 Title: Combine multi-dimensional arrays
-Author: Tony Plate <tplate@attglobal.net> and Richard Heiberger
-Maintainer: Tony Plate <tplate@attglobal.net>
+Author: Tony Plate <tplate@acm.org> and Richard Heiberger
+Maintainer: Tony Plate <tplate@acm.org>
 Description: Combine multi-dimensional arrays.  This is a
  generalization of cbind and rbind.  Takes a sequence of
  vectors, matrices, or arrays and produces a single array of

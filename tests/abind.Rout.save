@@ -1,5 +1,3 @@
-
-
 > library(abind)
 > # unlike cbind or rbind
 > abind(x=1:4,y=5:8)
@@ -13,16 +11,11 @@ x1 x2 x3 x4 y1 y2 y3 y4
 [3,] 3 7
 [4,] 4 8
 > abind(x=1:4,matrix(5:20,nrow=4),along=2)
-     x matrix(5:20, nrow = 4)1 matrix(5:20, nrow = 4)2 matrix(5:20, nrow = 4)3
-[1,] 1                       5                       9                      13
-[2,] 2                       6                      10                      14
-[3,] 3                       7                      11                      15
-[4,] 4                       8                      12                      16
-     matrix(5:20, nrow = 4)4
-[1,]                      17
-[2,]                      18
-[3,]                      19
-[4,]                      20
+     x           
+[1,] 1 5  9 13 17
+[2,] 2 6 10 14 18
+[3,] 3 7 11 15 19
+[4,] 4 8 12 16 20
 > abind(1:4,matrix(5:20,nrow=4),along=2)
      [,1] [,2] [,3] [,4] [,5]
 [1,]    1    5    9   13   17
@@ -31,27 +24,27 @@ x1 x2 x3 x4 y1 y2 y3 y4
 [4,]    4    8   12   16   20
 > # like rbind
 > abind(x=1:4,matrix(5:20,nrow=4),along=1)
+  [,1] [,2] [,3] [,4]
+x    1    2    3    4
+     5    9   13   17
+     6   10   14   18
+     7   11   15   19
+     8   12   16   20
+> abind(1:4,matrix(5:20,nrow=4),along=1,make.names=TRUE)
                         [,1] [,2] [,3] [,4]
-x                          1    2    3    4
+1:4                        1    2    3    4
 matrix(5:20, nrow = 4)1    5    9   13   17
 matrix(5:20, nrow = 4)2    6   10   14   18
 matrix(5:20, nrow = 4)3    7   11   15   19
 matrix(5:20, nrow = 4)4    8   12   16   20
-> abind(1:4,matrix(5:20,nrow=4),along=1)
-     [,1] [,2] [,3] [,4]
-[1,]    1    2    3    4
-[2,]    5    9   13   17
-[3,]    6   10   14   18
-[4,]    7   11   15   19
-[5,]    8   12   16   20
 > # different default dimnames:
 > abind(x=1:4,matrix(5:20,nrow=4),along=1)
-                        [,1] [,2] [,3] [,4]
-x                          1    2    3    4
-matrix(5:20, nrow = 4)1    5    9   13   17
-matrix(5:20, nrow = 4)2    6   10   14   18
-matrix(5:20, nrow = 4)3    7   11   15   19
-matrix(5:20, nrow = 4)4    8   12   16   20
+  [,1] [,2] [,3] [,4]
+x    1    2    3    4
+     5    9   13   17
+     6   10   14   18
+     7   11   15   19
+     8   12   16   20
 > abind(x=1:4,matrix(5:20,nrow=4),along=1,force.array=FALSE)
   [,1] [,2] [,3] [,4]
 x    1    2    3    4
@@ -89,10 +82,10 @@ y 3 4
 [1,]    1    2    3    4
 [2,]    5    6    7    8
 > # different default dimnames:
-> aperm(abind(1:4,5:8,along=2),c(2,1))
-     [,1] [,2] [,3] [,4]
-[1,]    1    2    3    4
-[2,]    5    6    7    8
+> aperm(abind(1:4,5:8,along=2,make.names=TRUE),c(2,1))
+    [,1] [,2] [,3] [,4]
+1:4    1    2    3    4
+5:8    5    6    7    8
 > # (3) convert arguments to row vectors
 > abind(matrix(1:4,nrow=1),matrix(5:8,nrow=1),along=1)
      [,1] [,2] [,3] [,4]
@@ -196,91 +189,105 @@ y   29   30   31   32
 > abind(a=aa, cc, matrix(25:36,3,4), along=0, use.first.dimnames=TRUE)
 , , A
 
-                     a  b  c
-a                    1  2  3
-cc                  25 26 27
-matrix(25:36, 3, 4) 25 26 27
+   a  b  c
+a  1  2  3
+  25 26 27
+  25 26 27
 
 , , B
 
-                     a  b  c
-a                    4  5  6
-cc                  28 29 30
-matrix(25:36, 3, 4) 28 29 30
+   a  b  c
+a  4  5  6
+  28 29 30
+  28 29 30
 
 , , C
 
-                     a  b  c
-a                    7  8  9
-cc                  31 32 33
-matrix(25:36, 3, 4) 31 32 33
+   a  b  c
+a  7  8  9
+  31 32 33
+  31 32 33
 
 , , D
 
-                     a  b  c
-a                   10 11 12
-cc                  34 35 36
-matrix(25:36, 3, 4) 34 35 36
+   a  b  c
+a 10 11 12
+  34 35 36
+  34 35 36
 
 > abind(a=aa, cc, matrix(25:36,3,4), along=1, use.first.dimnames=TRUE)
-                      A  B  C  D
-a                     1  4  7 10
-b                     2  5  8 11
-c                     3  6  9 12
-1                    25 28 31 34
-2                    26 29 32 35
-3                    27 30 33 36
-matrix(25:36, 3, 4)1 25 28 31 34
-matrix(25:36, 3, 4)2 26 29 32 35
-matrix(25:36, 3, 4)3 27 30 33 36
+   A  B  C  D
+a  1  4  7 10
+b  2  5  8 11
+c  3  6  9 12
+1 25 28 31 34
+2 26 29 32 35
+3 27 30 33 36
+  25 28 31 34
+  26 29 32 35
+  27 30 33 36
 > abind(a=aa, cc, matrix(25:36,3,4), along=1.1, use.first.dimnames=TRUE)
 , , A
 
-  a cc matrix(25:36, 3, 4)
-a 1 25                  25
-b 2 26                  26
-c 3 27                  27
+  a      
+a 1 25 25
+b 2 26 26
+c 3 27 27
 
 , , B
 
-  a cc matrix(25:36, 3, 4)
-a 4 28                  28
-b 5 29                  29
-c 6 30                  30
+  a      
+a 4 28 28
+b 5 29 29
+c 6 30 30
 
 , , C
 
-  a cc matrix(25:36, 3, 4)
-a 7 31                  31
-b 8 32                  32
-c 9 33                  33
+  a      
+a 7 31 31
+b 8 32 32
+c 9 33 33
 
 , , D
 
-   a cc matrix(25:36, 3, 4)
-a 10 34                  34
-b 11 35                  35
-c 12 36                  36
+   a      
+a 10 34 34
+b 11 35 35
+c 12 36 36
 
 > abind(a=aa, cc, matrix(25:36,3,4), along=2)
-  A B C  D V1 V2 V3 V4 matrix(25:36, 3, 4)1 matrix(25:36, 3, 4)2
-1 1 4 7 10 25 28 31 34                   25                   28
-2 2 5 8 11 26 29 32 35                   26                   29
-3 3 6 9 12 27 30 33 36                   27                   30
-  matrix(25:36, 3, 4)3 matrix(25:36, 3, 4)4
-1                   31                   34
-2                   32                   35
-3                   33                   36
+  A B C  D V1 V2 V3 V4            
+1 1 4 7 10 25 28 31 34 25 28 31 34
+2 2 5 8 11 26 29 32 35 26 29 32 35
+3 3 6 9 12 27 30 33 36 27 30 33 36
 > abind(a=aa, cc, matrix(25:36,3,4), along=2, use.first.dimnames=TRUE)
-  A B C  D V1 V2 V3 V4 matrix(25:36, 3, 4)1 matrix(25:36, 3, 4)2
-a 1 4 7 10 25 28 31 34                   25                   28
-b 2 5 8 11 26 29 32 35                   26                   29
-c 3 6 9 12 27 30 33 36                   27                   30
-  matrix(25:36, 3, 4)3 matrix(25:36, 3, 4)4
-a                   31                   34
-b                   32                   35
-c                   33                   36
+  A B C  D V1 V2 V3 V4            
+a 1 4 7 10 25 28 31 34 25 28 31 34
+b 2 5 8 11 26 29 32 35 26 29 32 35
+c 3 6 9 12 27 30 33 36 27 30 33 36
 > abind(a=aa, cc, matrix(25:36,3,4), along=3, use.first.dimnames=TRUE)
+, , a
+
+  A B C  D
+a 1 4 7 10
+b 2 5 8 11
+c 3 6 9 12
+
+, , 
+
+   A  B  C  D
+a 25 28 31 34
+b 26 29 32 35
+c 27 30 33 36
+
+, , 
+
+   A  B  C  D
+a 25 28 31 34
+b 26 29 32 35
+c 27 30 33 36
+
+> abind(a=aa, cc, matrix(25:36,3,4), along=3, make.names=TRUE, use.first.dimnames=TRUE)
 , , a
 
   A B C  D
@@ -302,53 +309,31 @@ a 25 28 31 34
 b 26 29 32 35
 c 27 30 33 36
 
-> abind(a=aa, cc, matrix(25:36,3,4), along=3, use.anon.names=FALSE, use.first.dimnames=TRUE)
-, , a
-
-  A B C  D
-a 1 4 7 10
-b 2 5 8 11
-c 3 6 9 12
-
-, , X2
-
-   A  B  C  D
-a 25 28 31 34
-b 26 29 32 35
-c 27 30 33 36
-
-, , X3
-
-   A  B  C  D
-a 25 28 31 34
-b 26 29 32 35
-c 27 30 33 36
-
 > abind(a=aa, cc, dd=matrix(25:36,3,4), along=1.1, use.first.dimnames=TRUE)
 , , A
 
-  a cc dd
+  a    dd
 a 1 25 25
 b 2 26 26
 c 3 27 27
 
 , , B
 
-  a cc dd
+  a    dd
 a 4 28 28
 b 5 29 29
 c 6 30 30
 
 , , C
 
-  a cc dd
+  a    dd
 a 7 31 31
 b 8 32 32
 c 9 33 33
 
 , , D
 
-   a cc dd
+   a    dd
 a 10 34 34
 b 11 35 35
 c 12 36 36
@@ -418,5 +403,154 @@ g 6 8
 f 11 13
 g 12 14
 
-> 
+> # Five different ways of binding together two matrices
+> x <- matrix(1:12,3,4)
+> y <- x+100
+> dim(abind(x,y,along=0))
+[1] 2 3 4
+> dim(abind(x,y,along=1))
+[1] 6 4
+> dim(abind(x,y,along=1.5))
+[1] 3 2 4
+> dim(abind(x,y,along=2))
+[1] 3 8
+> dim(abind(x,y,along=3))
+[1] 3 4 2
+> dim(abind(x,y,rev.along=0))
+[1] 3 4 2
+> dim(abind(x,y,rev.along=1))
+[1] 3 8
+> # using a list argument
+> abind(list(x=1:4,y=5:8))
+x1 x2 x3 x4 y1 y2 y3 y4 
+ 1  2  3  4  5  6  7  8 
+> abind(list(x=1:4,y=5:8),along=2)                   
+     x y
+[1,] 1 5
+[2,] 2 6
+[3,] 3 7
+[4,] 4 8
+> abind(list(x=1:4,matrix(5:20,nrow=4)),along=2)
+     x           
+[1,] 1 5  9 13 17
+[2,] 2 6 10 14 18
+[3,] 3 7 11 15 19
+[4,] 4 8 12 16 20
+> abind(list(1:4,matrix(5:20,nrow=4)),along=2)
+     [,1] [,2] [,3] [,4] [,5]
+[1,]    1    5    9   13   17
+[2,]    2    6   10   14   18
+[3,]    3    7   11   15   19
+[4,]    4    8   12   16   20
+> L <- list(1:4,matrix(5:20,nrow=4))
+> abind(L,along=2)
+     [,1] [,2] [,3] [,4] [,5]
+[1,]    1    5    9   13   17
+[2,]    2    6   10   14   18
+[3,]    3    7   11   15   19
+[4,]    4    8   12   16   20
+> abind(L,along=1)
+     [,1] [,2] [,3] [,4]
+[1,]    1    2    3    4
+[2,]    5    9   13   17
+[3,]    6   10   14   18
+[4,]    7   11   15   19
+[5,]    8   12   16   20
+> L <- list(x=1:4,matrix(5:20,nrow=4))
+> abind(L,along=2)
+     x           
+[1,] 1 5  9 13 17
+[2,] 2 6 10 14 18
+[3,] 3 7 11 15 19
+[4,] 4 8 12 16 20
+> # Equivalent call to cbind
+> do.call("cbind", L)
+     x           
+[1,] 1 5  9 13 17
+[2,] 2 6 10 14 18
+[3,] 3 7 11 15 19
+[4,] 4 8 12 16 20
+> # Equivalent call to rbind
+> abind(L,along=1)
+  [,1] [,2] [,3] [,4]
+x    1    2    3    4
+     5    9   13   17
+     6   10   14   18
+     7   11   15   19
+     8   12   16   20
+> do.call("rbind", L)
+  [,1] [,2] [,3] [,4]
+x    1    2    3    4
+     5    9   13   17
+     6   10   14   18
+     7   11   15   19
+     8   12   16   20
+> L <- list(x=1:4,y=5:8)
+> abind(L,along=0)
+  [,1] [,2] [,3] [,4]
+x    1    2    3    4
+y    5    6    7    8
+> abind(L,along=1)
+x1 x2 x3 x4 y1 y2 y3 y4 
+ 1  2  3  4  5  6  7  8 
+> abind(L,along=2)
+     x y
+[1,] 1 5
+[2,] 2 6
+[3,] 3 7
+[4,] 4 8
+> # behavior with NULL objects
+> dim(abind(list(a=NULL, b=NULL), along=1))
+NULL
+> abind(list(a=NULL, b=NULL), along=1)
+NULL
+> dimnames(abind(list(a=NULL, b=NULL), along=1))
+NULL
+> abind(list(a=NULL, b=NULL), along=2)
+NULL
+> dim(abind(list(a=NULL, b=NULL), along=2))
+NULL
+> dimnames(abind(list(a=NULL, b=NULL), along=2))
+NULL
+> abind(list(a=NULL, b=NULL), along=0)
+NULL
+> dim(abind(list(a=NULL, b=NULL), along=0))
+NULL
+> dimnames(abind(list(a=NULL, b=NULL), along=0))
+NULL
+> abind(list(a=NULL, b=NULL), along=3)
+NULL
+> # behavior with numeric(0) objects
+> dim(abind(list(a=numeric(0), b=numeric(0)), along=1))
+[1] 0
+> abind(list(a=numeric(0), b=numeric(0)), along=1)
+numeric(0)
+> dimnames(abind(list(a=numeric(0), b=numeric(0)), along=1))
+[[1]]
+NULL
+
+> abind(list(a=numeric(0), b=numeric(0)), along=2)
+     a b
+> dim(abind(list(a=numeric(0), b=numeric(0)), along=2))
+[1] 0 2
+> dimnames(abind(list(a=numeric(0), b=numeric(0)), along=2))
+[[1]]
+NULL
+
+[[2]]
+[1] "a" "b"
+
+> abind(list(a=numeric(0), b=numeric(0)), along=0)
+
+a
+b
+> dim(abind(list(a=numeric(0), b=numeric(0)), along=0))
+[1] 2 0
+> dimnames(abind(list(a=numeric(0), b=numeric(0)), along=0))
+[[1]]
+[1] "a" "b"
+
+[[2]]
+NULL
+
 > 

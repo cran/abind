@@ -1,32 +1,60 @@
-abind <-
-    function(..., along=N, new.names=NULL, force.array=TRUE, use.anon.names=TRUE, use.first.dimnames=FALSE)
+abind <- function(..., along=N, rev.along=NULL, new.names=NULL,
+                  force.array=TRUE, make.names=use.anon.names, use.anon.names=FALSE, use.first.dimnames=FALSE)
 {
-    do.aperm <- function(x, perm) {
-        if (any(perm != (1:length(perm)))) aperm(x, perm) else x
+    arg.list <- list(...)
+    if (is.list(arg.list[[1]]) && !is.data.frame(arg.list[[1]])) {
+        if (length(arg.list)!=1)
+            stop("can only supply one list-valued argument for ...")
+        if (make.names)
+            stop("cannot have make.names=TRUE with a list argument")
+        arg.list <- arg.list[[1]]
+        have.list.arg <- TRUE
+    } else {
+        N <- max(1, sapply(list(...), function(x) length(dim(x))))
+        have.list.arg <- FALSE
     }
-    # N will be length(dim(out))
-    N <- max(1, sapply(list(...), function(x) length(dim(x))))
-    if (along == 0 || (along > floor(along) && along < ceiling(along))) {
+    arg.list <- arg.list[!sapply(arg.list, is.null)]
+    if (length(arg.list)==0)
+        return(NULL)
+    N <- max(1, sapply(arg.list, function(x) length(dim(x))))
+
+    # N will eventually be length(dim(return.value))
+    if (!is.null(rev.along))
+        along <- N + 1 - rev.along
+
+    if (along < 1 || along > N || (along > floor(along) && along < ceiling(along))) {
         N <- N + 1
-        along <- if (along == 0) 1 else ceiling(along)
+        along <- max(1, min(N+1, ceiling(along)))
     }
+
+    # this next check should be redundant, but keep it here for safety...
     if (length(along) > 1 || along < 1 || along > N + 1)
         stop(paste("\"along\" must specify one dimension of the array,",
                    "or interpolate between two dimensions of the array",
                    sep="\n"))
-    if (along > N) N <- along
 
-    if (!force.array && N == 2) {
-        if (along == 2) return(cbind(...))
-        if (along == 1) return(rbind(...))
+    if (!force.array && N==2) {
+        if (!have.list.arg) {
+            if (along==2)
+                return(cbind(...))
+            if (along==1)
+                return(rbind(...))
+        } else {
+            if (along==2)
+                return(do.call("cbind", arg.list))
+            if (along==1)
+                return(do.call("rbind", arg.list))
+        }
     }
 
-    pre <- seq(from=1, len=along - 1)
-    post <- seq(to=N - 1, len=N - along)
-    # "perm" specifies permutation to put join dimension (along) last
-    perm <- c((1:N)[ - along], along)
+    if (along>N || along<0)
+        stop("along must between 0 and ", N)
 
-    arg.list <- list(...)
+    pre <- seq(from=1, len=along-1)
+    post <- seq(to=N-1, len=N-along)
+    # "perm" specifies permutation to put join dimension (along) last
+    perm <- c((1:N)[-along], along)
+
     arg.names <- names(arg.list)
     if (is.null(arg.names)) arg.names <- rep("", length(arg.list))
     # if new.names is a character vector, treat it as argument names
@@ -35,7 +63,6 @@ abind <-
             new.names[nchar(new.names)>0]
         new.names <- NULL
     }
-    use.along.names <- any(arg.names!="")
 
     # Be careful with dot.args, because if abind was called
     # using do.call(), and had anonymous arguments, the expressions
@@ -55,32 +82,37 @@ abind <-
     # Create deparsed versions of actual arguments in arg.alt.names
     # These are used for error messages
     if (any(arg.names=="")) {
-        if (use.anon.names) {
-            # dot.args is the calling expression
-            dot.args <- match.call(expand.dots=FALSE)$...
-            # the test of length(dot.args) is necessary for things to work
-            # with R1.5 (prerelease) -- dot.args loses the "list" functor with R
+        if (make.names) {
+            # Create dot.args to be a list of calling expressions for the objects to be bound.
+            # Be careful here with translation to R --
+            # dot.args does not have the "list" functor with R
             # (and dot.args is not a call object), whereas with S-plus, dot.args
             # must have the list functor removed
-            if (length(dot.args)>length(arg.list))
+            dot.args <- match.call(expand.dots=FALSE)$... # [[2]]
+            if (is.call(dot.args) && identical(dot.args[[1]], as.name("list")))
                 dot.args <- dot.args[-1]
             arg.alt.names <- arg.names
             for (i in seq(along=arg.names)) {
                 if (arg.alt.names[i]=="") {
-                    if (object.size(dot.args[[i]])<1000)
+                    if (object.size(dot.args[[i]])<1000) {
                         arg.alt.names[i] <- paste(deparse(dot.args[[i]], 40), collapse=";")
-                    else
+                    } else {
                         arg.alt.names[i] <- paste("X", i, sep="")
+                    }
                     arg.names[i] <- arg.alt.names[i]
                 }
             }
+            # unset(dot.args) don't need dot.args any more, but R doesn't have unset()
         } else {
-            arg.names[arg.names==""] <- paste("X", seq(along=arg.names), sep="")[arg.names==""]
             arg.alt.names <- arg.names
+            arg.alt.names[arg.names==""] <- paste("X", seq(along=arg.names), sep="")[arg.names==""]
         }
     } else {
         arg.alt.names <- arg.names
     }
+
+    use.along.names <- any(arg.names!="")
+
     # need to have here: arg.names, arg.alt.names, don't need dot.args
 
     names(arg.list) <- arg.names
@@ -98,16 +130,18 @@ abind <-
 
         # be careful with conversion to array: as.array converts data frames badly
         if (is.data.frame(m)) {
-            m <- data.matrix(m)
-        } else if (!is.array(m)) {
+            # use as.matrix() in preference to data.matrix() because
+            # data.matrix() uses the unintuitive codes() function on factors
+            m <- as.matrix(m)
+        } else if (!is.array(m) && !is.null(m)) {
             # make sure to get the names of a vector and attach them to the array
             dn <- names(m)
             m <- as.array(m)
-            if (!is.null(dn))
+            if (length(dim(m))==1 && !is.null(dn))
                 dimnames(m) <- list(dn)
         }
         new.dim <- dim(m)
-        if (length(new.dim) == N) {
+        if (length(new.dim)==N) {
             # Assign the dimnames of this argument to the i'th column of dimnames.all.
             # If dimnames(m) is NULL, would need to do dimnames.all[,i] <- list(NULL)
             # to set all elts to NULL, as dimnames.all[,i] <- NULL does not actually
@@ -116,7 +150,9 @@ abind <-
             # anything when dimnames(m) is NULL
             if (!is.null(dimnames(m)))
                 dimnames.all[,i] <- dimnames(m)[perm]
-        } else if (length(new.dim) == N - 1) {
+        } else if (length(new.dim)==0) {
+            # do nothing
+        } else if (length(new.dim)==N-1) {
             # add another dimension (first set dimnames to NULL to prevent errors)
             if (!is.null(dimnames(m))) {
                 # dimnames.all[,i] <- c(dimnames(m)[pre], list(NULL), dimnames(m))[post]
@@ -126,25 +162,37 @@ abind <-
                 dimnames(m) <- NULL
             }
             dim(m) <- c(new.dim[pre], 1, new.dim[post])
-        }
-        else stop(paste("'", arg.alt.names[i],
+        } else {
+            stop(paste("'", arg.alt.names[i],
                         "' does not fit: should have `length(dim())'=",
                         N, " or ", N-1, sep=""))
+        }
 
-        if (any(perm!=seq(along=perm)))
+        if (any(perm!=seq(along=perm)) && !is.null(m))
             arg.list[[i]] <- aperm(m, perm)
         else
             arg.list[[i]] <- m
     }
 
-    # arg.dim is a matrix with length(dim) rows and length(arg.list)
-    # columns: arg.dim[j,i]==dim(arg.list[[i]])[j]
+    # Make sure all arguments conform
+    conform.dim <- NULL
+    for (i in seq(along=arg.list)) {
+        if (!is.null(arg.list[[i]])) {
+            conform.dim <- dim(arg.list[[i]])
+            break
+        }
+    }
+    conform.dim[N] <- 0
+    for (i in seq(along=arg.list)) {
+        if (any((conform.dim!=dim(arg.list[[i]]))[-N])) {
+            stop("arg '", arg.alt.names[i], "' has dims=", paste(dim(arg.list[[i]]), collapse=", "),
+                 "; but need dims=", paste(replace(conform.dim, N, "X"), collapse=", "))
+        }
+    }
+
+    # Create arg.dim as a matrix with length(dim) rows and
+    # length(arg.list) columns: arg.dim[j,i]==dim(arg.list[[i]])[j]
     arg.dim <- do.call("cbind", lapply(arg.list, dim))
-    if (!all(arg.dim[-N,1] == arg.dim[-N,-1]))
-        stop(paste("'", arg.alt.names[seq(2,length(arg.alt.names))
-                                  [!apply(arg.dim[-N,1]==arg.dim[-N,-1,drop=FALSE], 2, all)][1]],
-                   "' does not fit: arrays must be same size except on dimension ",
-                   along, sep=""))
 
     # find the last (or first) names for each dimensions except the join dimension
     if (N>1)
@@ -159,22 +207,26 @@ abind <-
 
     # find or create names for the join dimension
     for (i in 1:length(arg.names)) {
-        dnmN <- dimnames.all[[N,i]]
-        if (length(dnmN) == dim(arg.list[[i]])[N])
-            use.along.names <- TRUE
-        else {
-            # make up names for the along dimension
-            if (dim(arg.list[[i]])[N]==1)
-                dnmN <- arg.names[i]
-            else if (arg.names[i]=="")
-                dnmN <- rep("", dim(arg.list[[i]])[N])
-            else
-                dnmN <- paste(arg.names[i], seq(length=dim(arg.list[[i]])[N]), sep="")
+        # only use names if arg i contributes some elements
+        if (dim(arg.list[[i]])[N] > 0) {
+            dnmN <- dimnames.all[[N,i]]
+            if (length(dnmN)==dim(arg.list[[i]])[N])
+                use.along.names <- TRUE
+            else {
+                # make up names for the along dimension
+                if (dim(arg.list[[i]])[N]==1)
+                    dnmN <- arg.names[i]
+                else if (arg.names[i]=="")
+                    dnmN <- rep("", dim(arg.list[[i]])[N])
+                else
+                    dnmN <- paste(arg.names[i], seq(length=dim(arg.list[[i]])[N]), sep="")
+            }
+            dimnames.new[[N]] <- c(dimnames.new[[N]], dnmN)
         }
-        dimnames.new[[N]] <- c(dimnames.new[[N]], dnmN)
     }
     # if no names at all were given for the along dimension, use none
-    if (!use.along.names) dimnames.new[N] <- list(NULL)
+    if (!use.along.names)
+        dimnames.new[N] <- list(NULL)
 
     # construct the output array from the pieces
     # don't use names in unlist because this can quickly exhaust memory
@@ -192,7 +244,7 @@ abind <-
             if (!is.null(new.names[[dd]]))
                 if (length(new.names[[dd]])==dim(out)[dd])
                     dimnames(out)[[dd]] <- new.names[[dd]]
-                else
+                else if (length(new.names[[dd]]))
                     warning(paste("Component ", dd,
                                   " of new.names ignored: has length ",
                                   length(new.names[[dd]]), ", should be ",

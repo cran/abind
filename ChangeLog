@@ -1,0 +1,13 @@
+2004-03-12    <tplate@ACONCAGUA>
+
+	* abind(): allow first argument to be a list of objects to be
+	bound -- this avoids the need for do.call() when one wants to bind
+	a list of objects
+
+	* abind(): changed default value for 'make.names' to FALSE (now
+	more closely behaves like rbind() and cbind())
+
+	* abind(): changed argument name 'use.anon.names' to the more
+	intuitive 'make.names'
+
+	* adrop(): added new function adrop()
