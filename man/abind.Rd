@@ -9,23 +9,24 @@ Combine multi-dimensional arrays.  This is a
  the same or higher dimension.
 }
 \usage{
-abind(..., along=N, new.names=NULL, force.array=TRUE, use.anon.names=TRUE, use.first.dimnames=F)
+abind(..., along=N, new.names=NULL, force.array=TRUE, use.anon.names=TRUE, use.first.dimnames=FALSE)
 }
 %- maybe also `usage' for other objects documented here.
 \arguments{
   \item{\dots}{
-Vectors, arrays, or data frames.  Missing values (NAs) are
+Vectors, arrays, or data frames.  Missing values (\code{NA}s) are
 allowed.  The dimensions of all the arrays must match,
-except on one dimension (specified by along=).  If these
+except on one dimension (specified by \code{along=}).  If these
 arguments are named, the name will be used for the name of
 the dimension along which the arrays are joined.
 }
 
 \item{along}{ (optional)
 The dimension along which to bind the arrays.  The default
-is the last dimension, i.e., N = the maximum length of the
-dim attribute of the supplied arrays.  along= can take any
-non-negative value up to N+1.  When along= has a fractional
+is the last dimension, i.e., the maximum length of the
+dim attribute of the supplied arrays.  \code{along=} can take any
+non-negative value up to the minimum length of the dim attribute of
+supplied arrays plus one.  When \code{along=} has a fractional
 value, a value less than 1, or a value greater than N, a new
 dimension is created in the result.  In these cases, the
 dimensions of all arguments must be identical.
@@ -34,10 +35,10 @@ dimensions of all arguments must be identical.
 If new.names is a list, it is the first choice for the
 dimnames attribute of the result.  It should have the same
 structure as a dimnames attribute.  If the names for a
-particular dimension are NULL, names for this dimension are
+particular dimension are \code{NULL}, names for this dimension are
 constructed in other ways.
 
-If new.names is a character vector, it is used for dimension
+If \code{new.names} is a character vector, it is used for dimension
 names in the same way as argument names are used.  Zero
 length ("") names are ignored.
 }
@@ -49,7 +50,7 @@ is 1 or 2.  If rbind or cbind are used, they will preserve
 the data.frame classes (or any other class that r/cbind
 preserve).  Otherwise, abind will convert objects to class
 array.  Thus, to guarantee that an array object is returned,
-supply the argument force.array=TRUE.  Note that the use of
+supply the argument \code{force.array=TRUE}.  Note that the use of
 rbind or cbind introduces some subtle changes in the way
 default dimension names are constructed: see the examples
 below.
@@ -73,8 +74,8 @@ The dimensions of the supplied vectors or arrays do not need
 to be identical, e.g., arguments can be a mixture of vectors
 and matrices.  \code{abind} coerces arguments by the addition
 of one dimension in order to make them consistent with other
-arguments and along=.  The extra dimension is
-added in the place specified by along=.
+arguments and \code{along=}.  The extra dimension is
+added in the place specified by \code{along=}.
 
 The default action of abind is to concatenate on the last
 dimension, rather than increase the number of dimensions.
@@ -82,8 +83,8 @@ For example, the result of calling abind with vectors is a
 longer vector (see first example below).  This differs from
 the action of \code{rbind} and cbind which is to return a matrix when
 called with vectors.  abind can be made to behave like cbind
-on vectors by specifying along=2, and like rbind by
-specifying along=0.
+on vectors by specifying \code{along=2}, and like rbind by
+specifying \code{along=0}.
 
 The dimnames of the returned object are pieced together
 from the dimnames of the arguments, and the names of the
@@ -98,28 +99,31 @@ for \code{rbind} and \code{cbind}: use dimnames
 from later arguments.)  If some names are supplied for the
 along dimension (either as argument names or dimnames in
 arguments), names are constructed for anonymous arguments
-unless use.anon.names=F.
-
-The function abind.nonames() is identical to abind() except
-that it ignores all dimnames information.  It is included
-for people to read in order to understand the algorithm.
-The argument list for abind.nonames() includes arguments
-regarding dimnames so that it can be called with the same
-list of arguments as abind().
+unless \code{use.anon.names=FALSE}.
 
 }
 \value{
-An array with a dim attribute of length \code{length(dim(...))} if
-\code{along} refers to an existing dimension, or
-\code{length(dim(...))+1} if \code{along} does not refer to an existing dimension.
+
+  An array with a dim attribute calculated as follows.
+
+  Let \code{rMin=min(sapply(list(...), function(x) length(dim(x))))} and
+  \code{rMax=max(sapply(list(...), function(x) length(dim(x))))} (where
+  the length of the dimensions of a vector are taken to be 1).  Then \code{rMax} should be
+  equal to or one greater than \code{rMin}.
+
+  If \code{along} refers to an existing dimension, then the length of
+  the dim attribute of the result is \code{rMax}.  If \code{along} does
+  not refer to an existing dimension, then \code{rMax} should equal
+  \code{rMin} and the length of the dim attribute of the result will be \code{rMax+1}.
 
 \code{rbind} or \code{cbind} are
 called to compute the result if (a)
-\code{force.array=F}; and (b) the result will be a
+\code{force.array=FALSE}; and (b) the result will be a
 two-dimensional object.
+
 }
 % \references{ ~put references to the literature/web site here ~ }
-\author{Tony Plate tplate@attglobal.net and Richard Heiberger }
+\author{Tony Plate \email{tplate@attglobal.net} and Richard Heiberger }
 % \note{ ~~further notes~~ }
 
 %  ~Make other sections like WARNING with \section{WARNING }{....} ~

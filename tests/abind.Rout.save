@@ -52,7 +52,7 @@ matrix(5:20, nrow = 4)1    5    9   13   17
 matrix(5:20, nrow = 4)2    6   10   14   18
 matrix(5:20, nrow = 4)3    7   11   15   19
 matrix(5:20, nrow = 4)4    8   12   16   20
-> abind(x=1:4,matrix(5:20,nrow=4),along=1,force.array=F)
+> abind(x=1:4,matrix(5:20,nrow=4),along=1,force.array=FALSE)
   [,1] [,2] [,3] [,4]
 x    1    2    3    4
      5    9   13   17
@@ -79,7 +79,7 @@ y    5    6    7    8
   c d
 x 1 2
 y 3 4
-> abind(x=c(a=1,b=2),y=c(c=3,d=4), along=0, use.first.dimnames=T)
+> abind(x=c(a=1,b=2),y=c(c=3,d=4), along=0, use.first.dimnames=TRUE)
   a b
 x 1 2
 y 3 4
@@ -193,7 +193,7 @@ y   29   30   31   32
 > # examples with three matrices
 > cc <- as.data.frame(matrix(25:36,nrow=3))
 > aa <- matrix(1:12,nrow=3,dimnames=list(letters[1:3],LETTERS[1:4]))
-> abind(a=aa, cc, matrix(25:36,3,4), along=0, use.first.dimnames=T)
+> abind(a=aa, cc, matrix(25:36,3,4), along=0, use.first.dimnames=TRUE)
 , , A
 
                      a  b  c
@@ -222,7 +222,7 @@ a                   10 11 12
 cc                  34 35 36
 matrix(25:36, 3, 4) 34 35 36
 
-> abind(a=aa, cc, matrix(25:36,3,4), along=1, use.first.dimnames=T)
+> abind(a=aa, cc, matrix(25:36,3,4), along=1, use.first.dimnames=TRUE)
                       A  B  C  D
 a                     1  4  7 10
 b                     2  5  8 11
@@ -233,7 +233,7 @@ c                     3  6  9 12
 matrix(25:36, 3, 4)1 25 28 31 34
 matrix(25:36, 3, 4)2 26 29 32 35
 matrix(25:36, 3, 4)3 27 30 33 36
-> abind(a=aa, cc, matrix(25:36,3,4), along=1.1, use.first.dimnames=T)
+> abind(a=aa, cc, matrix(25:36,3,4), along=1.1, use.first.dimnames=TRUE)
 , , A
 
   a cc matrix(25:36, 3, 4)
@@ -271,7 +271,7 @@ c 12 36                  36
 1                   31                   34
 2                   32                   35
 3                   33                   36
-> abind(a=aa, cc, matrix(25:36,3,4), along=2, use.first.dimnames=T)
+> abind(a=aa, cc, matrix(25:36,3,4), along=2, use.first.dimnames=TRUE)
   A B C  D V1 V2 V3 V4 matrix(25:36, 3, 4)1 matrix(25:36, 3, 4)2
 a 1 4 7 10 25 28 31 34                   25                   28
 b 2 5 8 11 26 29 32 35                   26                   29
@@ -280,7 +280,7 @@ c 3 6 9 12 27 30 33 36                   27                   30
 a                   31                   34
 b                   32                   35
 c                   33                   36
-> abind(a=aa, cc, matrix(25:36,3,4), along=3, use.first.dimnames=T)
+> abind(a=aa, cc, matrix(25:36,3,4), along=3, use.first.dimnames=TRUE)
 , , a
 
   A B C  D
@@ -302,7 +302,7 @@ a 25 28 31 34
 b 26 29 32 35
 c 27 30 33 36
 
-> abind(a=aa, cc, matrix(25:36,3,4), along=3, use.anon.names=F, use.first.dimnames=T)
+> abind(a=aa, cc, matrix(25:36,3,4), along=3, use.anon.names=FALSE, use.first.dimnames=TRUE)
 , , a
 
   A B C  D
@@ -324,7 +324,7 @@ a 25 28 31 34
 b 26 29 32 35
 c 27 30 33 36
 
-> abind(a=aa, cc, dd=matrix(25:36,3,4), along=1.1, use.first.dimnames=T)
+> abind(a=aa, cc, dd=matrix(25:36,3,4), along=1.1, use.first.dimnames=TRUE)
 , , A
 
   a cc dd
