@@ -1,0 +1,58 @@
+> x <- array(1:24, dim=c(6,4), dimnames=list(LETTERS[1:6], letters[23:26]))
+> x1 <- x
+> x1[2:4,2:3] <- -(1:6)
+> x1
+  w  x  y  z 
+A 1  7 13 19
+B 2 -1 -4 20
+C 3 -2 -5 21
+D 4 -3 -6 22
+E 5 11 17 23
+F 6 12 18 24
+> x1 <- x
+> x1[LETTERS[2:4],letters[24:25]] <- -(1:6)
+> x1
+  w  x  y  z 
+A 1  7 13 19
+B 2 -1 -4 20
+C 3 -2 -5 21
+D 4 -3 -6 22
+E 5 11 17 23
+F 6 12 18 24
+> x2 <- x
+> subfill(x2) <- array(-(1:6),dim=c(3,2), dimnames=list(LETTERS[2:4],letters[24:25]))
+> x2
+  w  x  y  z 
+A 1  7 13 19
+B 2 -1 -4 20
+C 3 -2 -5 21
+D 4 -3 -6 22
+E 5 11 17 23
+F 6 12 18 24
+> identical(x1, x2)
+[1] T
+> x2 <- x
+> subfill(x2) <- array(-(1:6),dim=c(3,2), dimnames=list(LETTERS[5:7],letters[24:25]))
+Problem in "subfill<-.default"(x2, value = structure..: value has dimnames
+	that are not in x; on dim[1]: 'G'
+> x2 <- x
+> subfill(x2,excess.ok=T) <- array(-(1:6),dim=c(3,2), dimnames=list(LETTERS[5:7],letters[24:25]))
+> x2
+  w  x  y  z 
+A 1  7 13 19
+B 2  8 14 20
+C 3  9 15 21
+D 4 10 16 22
+E 5 -1 -4 23
+F 6 -2 -5 24
+> x2 <- x
+> subfill(x2, local=T) <- array(-(1:6),dim=c(3,2), dimnames=list(LETTERS[2:4],letters[24:25]))
+> x2
+  w  x  y  z 
+A 1  7 13 19
+B 2 -1 -4 20
+C 3 -2 -5 21
+D 4 -3 -6 22
+E 5 11 17 23
+F 6 12 18 24
+> 

@@ -1,0 +1,68 @@
+This is not implemented yet.
+2009/01/03: trying to make more efficient in space & time
+The current version uses unlist() to put together the pieces
+
+Here's a trace with the unlist() version:
+> x <- matrix(numeric(1e6), ncol=1000)
+> y <- matrix(numeric(1e6), ncol=1000)
+> gc(reset=T)
+          used (Mb) gc trigger (Mb) max used (Mb)
+Ncells  110503  3.0     350000  9.4   110503  3.0
+Vcells 2075569 15.9    4524482 34.6  2075569 15.9
+> gc()
+          used (Mb) gc trigger (Mb) max used (Mb)
+Ncells  110508  3.0     350000  9.4   110654  3.0
+Vcells 2075592 15.9    4524482 34.6  2075674 15.9
+> invisible(gc(F,T))
+> z <- abind(x, y, along=3) # get same mem usage for all values of along
+> gc()
+          used (Mb) gc trigger (Mb) max used (Mb)
+Ncells  112809  3.1     350000  9.4   114257  3.1
+Vcells 4075867 31.1   11874844 90.6 11076632 84.6
+> gc(reset=T)
+          used (Mb) gc trigger (Mb) max used (Mb)
+Ncells  112818  3.1     350000  9.4   112818  3.1
+Vcells 4075890 31.1   11874844 90.6  4075890 31.1
+> 
+
+Should be able to do this with just this much memory:
+
+> rm(x)
+> rm(y)
+> rm(z)
+> gc(reset=T)
+         used (Mb) gc trigger (Mb) max used (Mb)
+Ncells 112799  3.1     350000  9.4   112799  3.1
+Vcells  75851  0.6    9499875 72.5    75851  0.6
+> x <- matrix(numeric(1e6), ncol=1000)
+> y <- matrix(numeric(1e6), ncol=1000)
+> z <- matrix(numeric(2e6), ncol=1000)
+> gc()
+          used (Mb) gc trigger (Mb) max used (Mb)
+Ncells  112809  3.1     350000  9.4   113137  3.1
+Vcells 4075854 31.1    9499875 72.5  8075969 61.7
+> gc(reset=T)
+          used (Mb) gc trigger (Mb) max used (Mb)
+Ncells  112818  3.1     350000  9.4   112818  3.1
+Vcells 4075877 31.1    9499875 72.5  4075877 31.1
+> 
+
+# Or even this, because, matrix() is not efficient with its input:
+
+> rm(x, y, z)
+> gc(reset=T)
+         used (Mb) gc trigger (Mb) max used (Mb)
+Ncells 112799  3.1     350000  9.4   112799  3.1
+Vcells  75851  0.6    7599899 58.0    75851  0.6
+> x <- matrix(numeric(1e6), ncol=1000)
+> y <- matrix(numeric(1e6), ncol=1000)
+> z <- numeric(2e6)
+> gc()
+          used (Mb) gc trigger (Mb) max used (Mb)
+Ncells  112807  3.1     350000  9.4   113103  3.1
+Vcells 4075853 31.1    7599899 58.0  6075968 46.4
+> gc(reset=T)
+          used (Mb) gc trigger (Mb) max used (Mb)
+Ncells  112816  3.1     350000  9.4   112816  3.1
+Vcells 4075876 31.1    7599899 58.0  4075876 31.1
+> 

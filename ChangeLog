@@ -1,13 +1,35 @@
-2004-03-12    <tplate@ACONCAGUA>
+2010-09-26  Tony Plate <tplate@acm.org>
+        * Version 1.3-0
+        * R/adrop.R: Make able to drop a 1-d array to a named vector
 
-	* abind(): allow first argument to be a list of objects to be
-	bound -- this avoids the need for do.call() when one wants to bind
-	a list of objects
+2009-12-03  Tony Plate <tplate@acm.org>
 
-	* abind(): changed default value for 'make.names' to FALSE (now
-	more closely behaves like rbind() and cbind())
+        * Version 1.2-0
+        * R/abind.R: Make code more efficient and cleaner
+        * R/adrop.R: Make adrop generic
+        * R/asub.R: add function asub() to subscript arrays on specified
+        dimensions
+        * R/afill.R: add function afill() <- value to fill subarrays on specified
+        dimensions
 
-	* abind(): changed argument name 'use.anon.names' to the more
-	intuitive 'make.names'
+2004-03-12 Tony Plate <tplate@acm.org>
 
-	* adrop(): added new function adrop()
+        * R/abind.R man/abind.Rd
+        Allow first argument of abind() to be a list of objects to be
+        bound -- this avoids the need for do.call() when one wants to bind
+        a list of objects
+
+        * R/abind.R man/abind.Rd
+        Changed argument name 'use.anon.names' to the more intuitive
+        'make.names' (the argument 'use.anon.names' still works)
+
+        * R/abind.R man/abind.Rd
+        Changed default value for 'make.names' to FALSE (now more closely
+        behaves like rbind() and cbind()).  This means that dimension
+        names for dimensions that have no names are only constructed
+        when requested, not by default.
+
+        * R/adrop.R man/adrop.Rd
+        Added new function adrop().  This is a function like drop(), but
+        it allows to user to specify which of the dimensions with extent
+        one will be dropped.

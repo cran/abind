@@ -1,6 +1,5 @@
 \name{abind}
 \alias{abind}
-%- Also NEED an `\alias' for EACH other topic documented here.
 \title{Combine multi-dimensional arrays}
 \description{
 Combine multi-dimensional arrays.  This is a
@@ -9,7 +8,9 @@ Combine multi-dimensional arrays.  This is a
  the same or higher dimension.
 }
 \usage{
-abind(..., along=N, rev.along=NULL, new.names=NULL, force.array=TRUE, make.names=use.anon.names, use.anon.names=FALSE, use.first.dimnames=FALSE)
+abind(..., along=N, rev.along=NULL, new.names=NULL, force.array=TRUE,
+      make.names=use.anon.names, use.anon.names=FALSE,
+      use.first.dimnames=FALSE, hier.names=FALSE)
 }
 %- maybe also `usage' for other objects documented here.
 \arguments{
@@ -85,6 +86,14 @@ the first available (the default is to take them from the
 last available, which is the same behavior as
 \code{rbind} and \code{cbind}.)
 }
+\item{hier.names}{ (optional)
+  If \code{TRUE}, dimension names on the concatenated dimension will be
+  composed of the argument name and the dimension names of the objects
+  being bound.  If a single list argument is supplied, then the names of
+  the components serve as the argument names.
+  \code{use.anon.names}
+is a deprecated synonym for \code{make.names}.
+}
 }
 \details{
 The dimensions of the supplied vectors or arrays do not need
@@ -117,7 +126,6 @@ from later arguments.)  If some names are supplied for the
 along dimension (either as argument names or dimnames in
 arguments), names are constructed for anonymous arguments
 unless \code{use.anon.names=FALSE}.
-
 }
 \value{
 
@@ -139,13 +147,17 @@ called to compute the result if (a)
 two-dimensional object.
 
 }
-% \references{ ~put references to the literature/web site here ~ }
 \author{Tony Plate \email{tplate@acm.org} and Richard Heiberger }
-% \note{ ~~further notes~~ }
+\note{
+It would be nice to make \code{abind()} an S3 generic, but S3 generics
+cannot dispatch off anonymous arguments.
 
-%  ~Make other sections like WARNING with \section{WARNING }{....} ~
-
-% \seealso{ ~~objects to SEE ALSO as \code{\link{~~fun~~}}, ~~~ }
+The ability of \code{abind()} to accept a single list argument removes
+much of the need for constructs like \code{do.call("abind",
+  list.of.arrays)}.  Instead, just do \code{abind(list.of.arrays)}.  The
+direct construct is preferred because \code{do.call()} construct can
+sometimes consume more memory during evaluation.
+}
 
 \examples{
 # Five different ways of binding together two matrices
@@ -165,7 +177,7 @@ dim(abind(x,y,rev.along=0)) # binds on new dimension after last
 # treated as an array with length(dim(x))==1).
 abind(x=1:4,y=5:8)
 # Like cbind
-abind(x=1:4,y=5:8,along=2)                   
+abind(x=1:4,y=5:8,along=2)
 abind(x=1:4,matrix(5:20,nrow=4),along=2)
 abind(1:4,matrix(5:20,nrow=4),along=2)
 # Like rbind
@@ -173,6 +185,8 @@ abind(x=1:4,matrix(5:20,nrow=4),along=1)
 abind(1:4,matrix(5:20,nrow=4),along=1)
 # Create a 3-d array out of two matrices
 abind(x=matrix(1:16,nrow=4),y=matrix(17:32,nrow=4),along=3)
+# Use of hier.names
+abind(x=cbind(a=1:3,b=4:6), y=cbind(a=7:9,b=10:12), hier.names=TRUE)
 }
 \keyword{ manip }% at least one, from doc/KEYWORDS
 \keyword{ array }% __ONLY ONE__ keyword per line
