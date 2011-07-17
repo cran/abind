@@ -1,4 +1,8 @@
 2010-09-26  Tony Plate <tplate@acm.org>
+        * Version 1.4-0
+        * added NAMESPACE
+
+2010-09-26  Tony Plate <tplate@acm.org>
         * Version 1.3-0
         * R/adrop.R: Make able to drop a 1-d array to a named vector
 

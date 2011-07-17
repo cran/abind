@@ -21,7 +21,7 @@ will be used for the name of the dimension along which the arrays are
 joined.  Vectors are treated as having a dim attribute of length one.
 
 Alternatively, there can be one (and only one) list argument supplied,
-whose compenents are the objects to be bound together.  Names of the
+whose components are the objects to be bound together.  Names of the
 list components are treated in the same way as argument names.
 }
 
@@ -187,6 +187,12 @@ abind(1:4,matrix(5:20,nrow=4),along=1)
 abind(x=matrix(1:16,nrow=4),y=matrix(17:32,nrow=4),along=3)
 # Use of hier.names
 abind(x=cbind(a=1:3,b=4:6), y=cbind(a=7:9,b=10:12), hier.names=TRUE)
+# Use a list argument
+abind(list(x=x, y=x), along=3)
+# Use lapply(..., get) to get the objects
+an <- c('x','y')
+names(an) <- an
+abind(lapply(an, get), along=3)
 }
 \keyword{ manip }% at least one, from doc/KEYWORDS
 \keyword{ array }% __ONLY ONE__ keyword per line

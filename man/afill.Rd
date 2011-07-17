@@ -1,4 +1,5 @@
 \name{afill}
+\alias{afill}
 \alias{afill<-}
 \alias{afill<-.default}
 %- Also NEED an '\alias' for EACH other topic documented here.
@@ -34,7 +35,7 @@ afill(x, ..., excess.ok = FALSE, local = TRUE) <- value
 \details{
   The simplest use of \code{afill} is to fill a sub-matrix. Here is an
   example of this usage:
-  \code{
+  \preformatted{
 > (x <- matrix(0, ncol=3, nrow=4, dimnames=list(letters[1:4], LETTERS[24:26])))
   X Y Z
 a 0 0 0
@@ -56,15 +57,15 @@ d 0 0 0
 }
 The above usage is equivalent (when x and y have appropriately matching
 dimnames) to
-\code{
-  x[match(rownames(y), rownames(x)), match(colnames(y), colnames(x))] <- y
-  }
+\preformatted{
+> x[match(rownames(y), rownames(x)), match(colnames(y), colnames(x))] <- y
+}
 
   A more complex usage of \code{afill} is to fill a sub-matrix in a
   slice of a higher-dimensional array.  In this case, indices for
   \code{x} must be supplied as arguments to \code{afill}, with the
   dimensions corresponding to those of \code{value} being empty, e.g.:
-  \code{
+  \preformatted{
 > x <- array(0, dim=c(2,4,3), dimnames=list(LETTERS[1:2], letters[1:4], LETTERS[24:26]))
 > y <- matrix(1:4, ncol=2, nrow=2, dimnames=list(letters[2:3], LETTERS[25:26]))
 > afill(x, 1, , ) <- y
@@ -80,7 +81,7 @@ a 0 0 0
 b 0 0 0
 c 0 0 0
 d 0 0 0
-> 
+>
 }
 
   The most complex usage of \code{afill} is to fill a sub-matrix in multiple
@@ -89,7 +90,7 @@ d 0 0 0
   dimensions corresponding to those of \code{value} being empty.
   Indices in which all slices should be filled can be supplied as
   \code{TRUE}.  E.g.:
-  \code{
+  \preformatted{
 > x <- array(0, dim=c(2,4,3), dimnames=list(LETTERS[1:2], letters[1:4], LETTERS[24:26]))
 > y <- matrix(1:4, ncol=2, nrow=2, dimnames=list(letters[2:3], LETTERS[25:26]))
 > afill(x, TRUE, , ) <- y
@@ -105,7 +106,7 @@ a 0 0 0
 b 0 1 3
 c 0 2 4
 d 0 0 0
-> 
+>
 }
 
 In the above usage, \code{afill} takes care of replicating \code{value}
@@ -123,24 +124,27 @@ in the appropriate fashion (which is not straghtforward in some cases).
 % \note{ ~~further notes~~ }
 \seealso{ \code{\link{Extract}} }
 \examples{
-# fill a submatrix
+# fill a submatrix defined by the dimnames on y
 (x <- matrix(0, ncol=3, nrow=4, dimnames=list(letters[1:4], LETTERS[24:26])))
 (y <- matrix(1:4, ncol=2, nrow=2, dimnames=list(letters[2:3], LETTERS[25:26])))
 afill(x) <- y
 x
+all.equal(asub(x, dimnames(y)), y) # TRUE
 # fill a slice in a higher dimensional array
 x <- array(0, dim=c(2,4,3), dimnames=list(LETTERS[1:2], letters[1:4], LETTERS[24:26]))
 y <- matrix(1:4, ncol=2, nrow=2, dimnames=list(letters[2:3], LETTERS[25:26]))
 afill(x, 1, , ) <- y
 x[1,,]
 x[2,,]
+all.equal(asub(x, c(1,dimnames(y))), y) # TRUE
 # fill multiple slices
 x <- array(0, dim=c(2,4,3), dimnames=list(LETTERS[1:2], letters[1:4], LETTERS[24:26]))
 y <- matrix(1:4, ncol=2, nrow=2, dimnames=list(letters[2:3], LETTERS[25:26]))
 afill(x, TRUE, , ) <- y
 x[1,,]
 x[2,,]
-
+all.equal(asub(x, c(1,dimnames(y))), y) # TRUE
+all.equal(asub(x, c(2,dimnames(y))), y) # TRUE
 }
 
 \keyword{ manip }
