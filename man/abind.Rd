@@ -10,7 +10,7 @@ Combine multi-dimensional arrays.  This is a
 \usage{
 abind(..., along=N, rev.along=NULL, new.names=NULL, force.array=TRUE,
       make.names=use.anon.names, use.anon.names=FALSE,
-      use.first.dimnames=FALSE, hier.names=FALSE)
+      use.first.dimnames=FALSE, hier.names=FALSE, use.dnns=FALSE)
 }
 %- maybe also `usage' for other objects documented here.
 \arguments{
@@ -90,9 +90,14 @@ last available, which is the same behavior as
   If \code{TRUE}, dimension names on the concatenated dimension will be
   composed of the argument name and the dimension names of the objects
   being bound.  If a single list argument is supplied, then the names of
-  the components serve as the argument names.
-  \code{use.anon.names}
-is a deprecated synonym for \code{make.names}.
+  the components serve as the argument names.  \code{hier.names} can
+  also have values \code{"before"} or \code{"after"}; these determine
+  the order in which the argument name and the dimension name are put
+  together (\code{TRUE} has the same effect as \code{"before"}).}
+\item{use.dnns}{ (default \code{FALSE}) Use names on dimensions, e.g.,
+  so that \code{names(dimnames(x))} is non-empty.  When there are
+  multiple possible sources for names of dimnames, the value of
+  \code{use.first.dimnames} determines the result.
 }
 }
 \details{

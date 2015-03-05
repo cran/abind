@@ -1,7 +1,11 @@
 abind <- function(..., along=N, rev.along=NULL, new.names=NULL,
                   force.array=TRUE, make.names=use.anon.names, use.anon.names=FALSE,
-                  use.first.dimnames=FALSE, hier.names=FALSE)
+                  use.first.dimnames=FALSE, hier.names=FALSE, use.dnns=FALSE)
 {
+    if (is.character(hier.names))
+        hier.names <- match.arg(hier.names, c('before', 'after', 'none'))
+    else
+        hier.names <- if (hier.names) 'before' else 'no'
     arg.list <- list(...)
     if (is.list(arg.list[[1]]) && !is.data.frame(arg.list[[1]])) {
         if (length(arg.list)!=1)
@@ -55,7 +59,7 @@ abind <- function(..., along=N, rev.along=NULL, new.names=NULL,
     pre <- seq(from=1, len=along-1)
     post <- seq(to=N-1, len=N-along)
     ## "perm" specifies permutation to put join dimension (along) last
-    perm <- c((1:N)[-along], along)
+    perm <- c(seq(len=N)[-along], along)
 
     arg.names <- names(arg.list)
     if (is.null(arg.names)) arg.names <- rep("", length(arg.list))
@@ -127,6 +131,10 @@ abind <- function(..., along=N, rev.along=NULL, new.names=NULL,
     ## the vector of names for dimension j of arg i
     arg.dimnames <- matrix(vector("list", N*length(arg.names)), nrow=N, ncol=length(arg.names))
     dimnames(arg.dimnames) <- list(NULL, arg.names)
+    ## arg.dnns is a matrix of names of dimensions, each element is a
+    ## character vector len 1, or NULL
+    arg.dnns <- matrix(vector("list", N*length(arg.names)), nrow=N, ncol=length(arg.names))
+    dimnames(arg.dnns) <- list(NULL, arg.names)
     dimnames.new <- vector("list", N)
 
     ## Coerce all arguments to have the same number of dimensions
@@ -138,7 +146,7 @@ abind <- function(..., along=N, rev.along=NULL, new.names=NULL,
     ## The dimension order of arg.dim is original
     arg.dim <- matrix(integer(1), nrow=N, ncol=length(arg.names))
 
-    for (i in 1:length(arg.list)) {
+    for (i in seq(len=length(arg.list))) {
         m <- arg.list[[i]]
         m.changed <- FALSE
 
@@ -166,8 +174,11 @@ abind <- function(..., along=N, rev.along=NULL, new.names=NULL,
             ## change anything in S-PLUS (leaves whatever is there) and illegal in R.
             ## Since arg.dimnames has NULL entries to begin with, don't need to do
             ## anything when dimnames(m) is NULL
-            if (!is.null(dimnames(m)))
+            if (!is.null(dimnames(m))) {
                 arg.dimnames[,i] <- dimnames(m)
+                if (use.dnns && !is.null(names(dimnames(m))))
+                    arg.dnns[,i] <- as.list(names(dimnames(m)))
+            }
             arg.dim[,i] <- new.dim
         } else if (length(new.dim)==N-1) {
             ## add another dimension (first set dimnames to NULL to prevent errors)
@@ -175,6 +186,8 @@ abind <- function(..., along=N, rev.along=NULL, new.names=NULL,
                 ## arg.dimnames[,i] <- c(dimnames(m)[pre], list(NULL), dimnames(m))[post]
                 ## is equivalent to arg.dimnames[-N,i] <- dimnames(m)
                 arg.dimnames[-along,i] <- dimnames(m)
+                if (use.dnns && !is.null(names(dimnames(m))))
+                    arg.dnns[-along,i] <- as.list(names(dimnames(m)))
                 ## remove the dimnames so that we can assign a dim of an extra length
                 dimnames(m) <- NULL
             }
@@ -209,20 +222,24 @@ abind <- function(..., along=N, rev.along=NULL, new.names=NULL,
             for (i in (if (use.first.dimnames) seq(along=arg.names) else rev(seq(along=arg.names)))) {
                 if (length(arg.dimnames[[dd,i]]) > 0) {
                     dimnames.new[[dd]] <- arg.dimnames[[dd,i]]
+                    if (use.dnns && !is.null(arg.dnns[[dd,i]]))
+                        names(dimnames.new)[dd] <- arg.dnns[[dd,i]]
                     break
                 }
             }
         }
 
     ## find or create names for the join dimension
-    for (i in 1:length(arg.names)) {
+    for (i in seq(len=length(arg.names))) {
         ## only use names if arg i contributes some elements
         if (arg.dim[along,i] > 0) {
             dnm.along <- arg.dimnames[[along,i]]
             if (length(dnm.along)==arg.dim[along,i]) {
                 use.along.names <- TRUE
-                if (hier.names && arg.names[i]!="")
+                if (hier.names=='before' && arg.names[i]!="")
                     dnm.along <- paste(arg.names[i], dnm.along, sep=".")
+                else if (hier.names=='after' && arg.names[i]!="")
+                    dnm.along <- paste(dnm.along, arg.names[i], sep=".")
             } else {
                 ## make up names for the along dimension
                 if (arg.dim[along,i]==1)
@@ -233,6 +250,14 @@ abind <- function(..., along=N, rev.along=NULL, new.names=NULL,
                     dnm.along <- paste(arg.names[i], seq(length=arg.dim[along,i]), sep="")
             }
             dimnames.new[[along]] <- c(dimnames.new[[along]], dnm.along)
+        }
+        if (use.dnns) {
+            dnn <- unlist(arg.dnns[along,])
+            if (length(dnn)) {
+                if (!use.first.dimnames)
+                    dnn <- rev(dnn)
+                names(dimnames.new)[along] <- dnn[1]
+            }
         }
     }
     ## if no names at all were given for the along dimension, use none
@@ -255,8 +280,8 @@ abind <- function(..., along=N, rev.along=NULL, new.names=NULL,
     ## if new.names is list of character vectors, use whichever are non-null
     ## for dimension names, checking that they are the right length
     if (!is.null(new.names) && is.list(new.names)) {
-        for (dd in 1:N)
-            if (!is.null(new.names[[dd]]))
+        for (dd in seq(len=N)) {
+            if (!is.null(new.names[[dd]])) {
                 if (length(new.names[[dd]])==dim(out)[dd])
                     dimnames(out)[[dd]] <- new.names[[dd]]
                 else if (length(new.names[[dd]]))
@@ -264,6 +289,12 @@ abind <- function(..., along=N, rev.along=NULL, new.names=NULL,
                                   " of new.names ignored: has length ",
                                   length(new.names[[dd]]), ", should be ",
                                   dim(out)[dd], sep=""))
+            }
+            if (use.dnns && !is.null(names(new.names)) && names(new.names)[dd]!='')
+                names(dimnames(out))[dd] <- names(new.names)[dd]
+        }
     }
+    if (use.dnns && !is.null(names(dimnames(out))) && any(i <- is.na(names(dimnames(out)))))
+        names(dimnames(out))[i] <- ''
     out
 }

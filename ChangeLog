@@ -1,6 +1,7 @@
-2010-09-26  Tony Plate <tplate@acm.org>
-        * Version 1.4-0
-        * added NAMESPACE
+2013-08-18  Tony Plate <tplate@acm.org>
+        * Version 1.4-1
+        * add use.dnns= arg to abind() to propagate names on dimnames (i.e., names(dimnames(x)))
+	* add ability for hier.names= arg to abind() to take values 'before' and 'after' (TRUE and FALSE still work with unchanged meaning)
 
 2010-09-26  Tony Plate <tplate@acm.org>
         * Version 1.3-0
