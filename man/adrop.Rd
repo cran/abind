@@ -10,7 +10,7 @@
   supplied in the \code{abind} package.
 }
 \usage{
-adrop(x, drop = TRUE, named.vector = TRUE, one.d.array = FALSE)
+adrop(x, drop = TRUE, named.vector = TRUE, one.d.array = FALSE, ...)
 }
 
 \arguments{
@@ -28,6 +28,8 @@ adrop(x, drop = TRUE, named.vector = TRUE, one.d.array = FALSE)
     length 1, and possibly a \code{dimnames} attribute.  If
     \code{FALSE}, a one-dimensional result will be a vector object
     (named if \code{named.vector==TRUE}).}
+  \item{...}{There are no additional arguments allowed for
+  \code{adrop.default} but other methods may use them.}
 }
 \details{
   Dimensions can only be dropped if their extent is one, i.e., dimension

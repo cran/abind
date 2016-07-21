@@ -43,7 +43,8 @@
     # Now we can work with evaluated dot args.
     # Can't do dot.args <- list(...) because that will
     # stop with an error for missing args.
-    dot.args <- mapply(dot.args.uneval, missing.dot.args, FUN=function(arg, m) if (!m) eval(arg) else NULL)
+    par.frame <- parent.frame()
+    dot.args <- mapply(dot.args.uneval, missing.dot.args, FUN=function(arg, m) if (!m) eval(arg, par.frame) else NULL)
     # construct the numeric indices
     idxs <- vector("list", length(x.d))
     strip.excess <- FALSE

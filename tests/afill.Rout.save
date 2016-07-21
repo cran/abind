@@ -33,7 +33,7 @@ B 2 4 6
   w x y
 A 1 3 5
 B 2 4 6
-> 
+>
 > # now do it with afill()
 > x[] <- 0
 > afill(x, TRUE, , ) <- matrix(1:6,ncol=3, dimnames=list(c("A","B"),c("w","x","y")))
@@ -58,9 +58,9 @@ A 1 3 5
 B 2 4 6
 > table(x==0)
 
-FALSE  TRUE 
-   12    12 
-> 
+FALSE  TRUE
+   12    12
+>
 > # 4-d example
 > x <- array(0, dim=c(2,3,3,4),dimnames=list(letters[1:2],LETTERS[1:3],letters[24:26],LETTERS[23:26]))
 > x[1,c("A","B"),1,c("W","X","Y")] <- 1:6
@@ -73,7 +73,7 @@ FALSE  TRUE
  [1] 1 1 2 2 1 1 2 2 1 1 2 2 3 3 4 4 3 3 4 4 3 3 4 4 5 5 6 6 5 5 6 6 5 5 6 6
 > c(matrix(1:6, ncol=3)[rep(1:2, each=2),rep(1:3,each=3)])
  [1] 1 1 2 2 1 1 2 2 1 1 2 2 3 3 4 4 3 3 4 4 3 3 4 4 5 5 6 6 5 5 6 6 5 5 6 6
-> 
+>
 > afill(x, T, , T, ) <- matrix(1:6,ncol=3, dimnames=list(c("A","B"),c("W","X","Y")))
 > x[1,c("A","B"),1,c("W","X","Y")]
   W X Y
@@ -101,9 +101,9 @@ A 1 3 5
 B 2 4 6
 > table(x==0)
 
-FALSE  TRUE 
-   36    36 
-> 
+FALSE  TRUE
+   36    36
+>
 > # 2-d example
 > x <- array(1:24, dim=c(6,4), dimnames=list(LETTERS[1:6], letters[23:26]))
 > x1 <- x
@@ -140,7 +140,7 @@ F 6 12 18 24
 [1] TRUE
 > x2 <- x
 > afill(x2) <- array(-(1:6),dim=c(3,2), dimnames=list(LETTERS[5:7],letters[24:25]))
-Error in `afill<-.default`(`*tmp*`, value = c(-1L, -2L, -3L, -4L, -5L,  : 
+Error in `afill<-.default`(`*tmp*`, value = c(-1L, -2L, -3L, -4L, -5L,  :
   value has dimnames that are not in 'x' on dim[1]: 'G'
 Calls: afill<- -> afill<-.default
 > x2 <- x
@@ -163,17 +163,52 @@ C 3 -2 -5 21
 D 4 -3 -6 22
 E 5 11 17 23
 F 6 12 18 24
-> 
+>
 > # 1-d named-vector example
 > x <- c(A=0,B=0,C=0,D=0)
 > afill(x) <- c(B=1,C=2)
 > x
-A B C D 
-0 1 2 0 
+A B C D
+0 1 2 0
 > # return value is the part of x that is assigned to
 > (afill(x) <- c(B=1,C=2))
-B C 
-1 2 
+B C
+1 2
 > (x[2:3] <- 0)
 [1] 0
-> 
+>
+> # test using a variable on the LHS
+> x <- cbind(X=c(a=1,b=2),Y=3:4)
+> x
+  X Y
+a 1 3
+b 2 4
+> afill(x, 1, ) <- c(Y=5)
+> x
+  X Y
+a 1 5
+b 2 4
+> afill(x, 1, ) <- c(X=6)
+> x
+  X Y
+a 6 5
+b 2 4
+> afill(x, 2, ) <- c(Y=7)
+> afill(x, 2, ) <- c(X=8)
+> x
+  X Y
+a 6 5
+b 8 7
+> i <- 1
+> afill(x, i, ) <- c(X=1)
+> x
+  X Y
+a 1 5
+b 8 7
+> i <- 2
+> afill(x, i, ) <- c(Y=2)
+> x
+  X Y
+a 1 5
+b 8 2
+>

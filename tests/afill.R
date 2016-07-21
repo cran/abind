@@ -80,3 +80,20 @@ x
 # return value is the part of x that is assigned to
 (afill(x) <- c(B=1,C=2))
 (x[2:3] <- 0)
+
+# test using a variable on the LHS
+x <- cbind(X=c(a=1,b=2),Y=3:4)
+x
+afill(x, 1, ) <- c(Y=5)
+x
+afill(x, 1, ) <- c(X=6)
+x
+afill(x, 2, ) <- c(Y=7)
+afill(x, 2, ) <- c(X=8)
+x
+i <- 1
+afill(x, i, ) <- c(X=1)
+x
+i <- 2
+afill(x, i, ) <- c(Y=2)
+x

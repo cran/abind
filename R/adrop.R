@@ -1,8 +1,13 @@
-adrop <- function(x, drop=TRUE, named.vector=TRUE, one.d.array=FALSE) UseMethod("adrop", x)
+adrop <- function(x, drop=TRUE, named.vector=TRUE, one.d.array=FALSE, ...) UseMethod("adrop")
 
-adrop.default <- function(x, drop=TRUE, named.vector=TRUE, one.d.array=FALSE) {
+adrop.default <- function(x, drop=TRUE, named.vector=TRUE, one.d.array=FALSE, ...) {
     if (is.null(dim(x)))
         stop("require an object with a dim attribute")
+    if (length(list(...)))
+        if (length(names(list(...))))
+            stop('have unrecognized ... arguments for adrop.default: ', paste(names(list(...)), collapse=', '))
+        else
+            stop('have unrecognized unnamed ... arguments for adrop.default')
     x.dim <- dim(x)
     if (is.logical(drop)) {
         if (length(drop) != length(x.dim))

@@ -1,8 +1,13 @@
-asub <- function(x, idx, dims=seq(len=max(length(dim(x)), 1)), drop=NULL) UseMethod("asub")
-asub.default <- function(x, idx, dims=seq(len=max(length(dim(x)), 1)), drop=NULL) {
+asub <- function(x, idx, dims=seq(len=max(length(dim(x)), 1)), drop=NULL, ...) UseMethod("asub")
+asub.default <- function(x, idx, dims=seq(len=max(length(dim(x)), 1)), drop=NULL, ...) {
     # Do arbitrary indexing of x as positions in dims
     if (length(dims)>1 && !is.list(idx))
         stop("idx must be a list when length dims>1")
+    if (length(list(...)))
+        if (length(names(list(...))))
+            stop('have unrecognized ... arguments for asub.default: ', paste(names(list(...)), collapse=', '))
+        else
+            stop('have unrecognized unnamed ... arguments for asub.default')
     if (!is.list(idx))
         idx <- list(idx)
     if (length(idx) != length(dims))

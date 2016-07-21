@@ -1,3 +1,10 @@
+2016-05-14  Tony Plate <tplate@acm.org>
+	* Version 1.4-4
+	* add imports to NAMESPACE file
+2016-04-16  Tony Plate <tplate@acm.org>
+        * Version 1.4-3
+        * add ... args to asub() and adrop() generics
+
 2013-08-18  Tony Plate <tplate@acm.org>
         * Version 1.4-1
         * add use.dnns= arg to abind() to propagate names on dimnames (i.e., names(dimnames(x)))

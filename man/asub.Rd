@@ -7,7 +7,7 @@ Subset array-like objects at specified indices.  \code{asub()} is a S3 generic, 
   one method, \code{asub.default}, supplied in the \code{abind} package.
 }
 \usage{
-asub(x, idx, dims = seq(len = max(length(dim(x)), 1)), drop = NULL)
+asub(x, idx, dims = seq(len = max(length(dim(x)), 1)), drop = NULL, ...)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -15,11 +15,13 @@ asub(x, idx, dims = seq(len = max(length(dim(x)), 1)), drop = NULL)
   \item{idx}{ A list of indices (e.g., a list of a mixture of integer,
     character, and logical vectors, but can actually be anything).  Can
     be just a vector in the case that \code{length(dims)==1}.
-    \code{NULL} entries in the list will be treated as empty indices.}  
+    \code{NULL} entries in the list will be treated as empty indices.}
   \item{dims}{ The dimensions on which to index (a numeric or integer
     vector).  The default is all of the dimensions.  }
   \item{drop}{ The 'drop' argument to index with (the default is to not
     supply a 'drop' argument }
+  \item{...}{There are no additional arguments allowed for
+  \code{asub.default} but other methods may use them.}
 }
 \details{
   Constructs and evaluates an expression to do the requested indexing.
