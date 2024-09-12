@@ -48,7 +48,7 @@
     # construct the numeric indices
     idxs <- vector("list", length(x.d))
     strip.excess <- FALSE
-    for (i in seq(len=length(x.d))) {
+    for (i in seq(length.out=length(x.d))) {
         if (missing.dot.args[i]) {
             j <- cumsum(missing.dot.args)[i] # dim-num in value
             idxs[[i]] <- match(value.dn[[j]], x.dn[[i]], nomatch=0)
@@ -65,9 +65,9 @@
                     stop("'x' doesn't have dimnames on dim ", i)
                 idxs[[i]] <- match(dot.args[[i]], x.dn[[i]], nomatch=NA)
                 if (any(is.na(idxs[[i]])))
-                    stop("LHS character indicies at on dim ", i, " not matched: ", paste("'", dot.args[[i]][which(is.na(idxs[[i]]))[seq(len=min(3, sum(is.na(idxs[[i]]))))]], "'", collapse=", "))
+                    stop("LHS character indicies at on dim ", i, " not matched: ", paste("'", dot.args[[i]][which(is.na(idxs[[i]]))[seq(length.out=min(3, sum(is.na(idxs[[i]]))))]], "'", collapse=", "))
             } else if (is.logical(dot.args[[i]])) {
-                idxs[[i]] <- seq(len=x.d[i])[dot.args[[i]]]
+                idxs[[i]] <- seq(length.out=x.d[i])[dot.args[[i]]]
                 if (any(is.na(idxs[[i]])))
                     stop("LHS logical indicies at on dim ", i, " have NA value")
             } else if (is.numeric(dot.args[[i]]) & all(dot.args[[i]] >= 0)) {
@@ -78,7 +78,7 @@
                 if (any(idxs[[i]] > x.d[i]))
                     stop("LHS numeric indicies at on dim ", i, " values too large")
             } else if (is.numeric(dot.args[[i]]) & all(dot.args[[i]] <= 0)) {
-                idxs[[i]] <- seq(len=x.d[i])[dot.args[[i]]]
+                idxs[[i]] <- seq(length.out=x.d[i])[dot.args[[i]]]
             } else {
                 stop("LHS args for indices at dim ", i, " must be character, logical, numeric>0 or numeric<=0")
             }
@@ -93,11 +93,11 @@
     if (prod(value.d)>1 && length(unique(value))>1) {
         j <- 0
         need.rep <- 1
-        for (i in seq(along=missing.dot.args)) {
+        for (i in seq(along.with=missing.dot.args)) {
             if (missing.dot.args[i]) {
                 j <- j+1
                 if (need.rep > 1)
-                    value <- asub(value, rep(seq(len=value.d[j]), each=need.rep), dims=j)
+                    value <- asub(value, rep(seq(length.out=value.d[j]), each=need.rep), dims=j)
                 need.rep <- 1
             } else {
                 need.rep <- need.rep * length(idxs[[i]])

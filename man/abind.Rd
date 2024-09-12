@@ -3,9 +3,9 @@
 \title{Combine multi-dimensional arrays}
 \description{
 Combine multi-dimensional arrays.  This is a
- generalization of cbind and rbind.  Takes a sequence of
- vectors, matrices, or arrays and produces a single array of
- the same or higher dimension.
+generalization of cbind and rbind.  Takes a sequence of
+vectors, matrices, or arrays and produces a single array of
+the same or higher dimension.
 }
 \usage{
 abind(..., along=N, rev.along=NULL, new.names=NULL, force.array=TRUE,

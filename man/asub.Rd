@@ -7,7 +7,7 @@ Subset array-like objects at specified indices.  \code{asub()} is a S3 generic, 
   one method, \code{asub.default}, supplied in the \code{abind} package.
 }
 \usage{
-asub(x, idx, dims = seq(len = max(length(dim(x)), 1)), drop = NULL, ...)
+asub(x, idx, dims = seq(length.out = max(length(dim(x)), 1)), drop = NULL, ...)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{

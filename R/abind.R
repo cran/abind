@@ -56,16 +56,16 @@ abind <- function(..., along=N, rev.along=NULL, new.names=NULL,
     if (along>N || along<0)
         stop("along must be between 0 and ", N)
 
-    pre <- seq(from=1, len=along-1)
-    post <- seq(to=N-1, len=N-along)
+    pre <- seq(from=1, length.out=along-1)
+    post <- seq(to=N-1, length.out=N-along)
     ## "perm" specifies permutation to put join dimension (along) last
-    perm <- c(seq(len=N)[-along], along)
+    perm <- c(seq(length.out=N)[-along], along)
 
     arg.names <- names(arg.list)
     if (is.null(arg.names)) arg.names <- rep("", length(arg.list))
     ## if new.names is a character vector, treat it as argument names
     if (is.character(new.names)) {
-        arg.names[seq(along=new.names)[nchar(new.names)>0]] <-
+        arg.names[seq(along.with=new.names)[nchar(new.names)>0]] <-
             new.names[nchar(new.names)>0]
         new.names <- NULL
     }
@@ -102,7 +102,7 @@ abind <- function(..., along=N, rev.along=NULL, new.names=NULL,
             if (is.call(dot.args) && identical(dot.args[[1]], as.name("list")))
                 dot.args <- dot.args[-1]
             arg.alt.names <- arg.names
-            for (i in seq(along=arg.names)) {
+            for (i in seq(along.with=arg.names)) {
                 if (arg.alt.names[i]=="") {
                     if (object.size(dot.args[[i]])<1000) {
                         arg.alt.names[i] <- paste(deparse(dot.args[[i]], 40), collapse=";")
@@ -115,7 +115,7 @@ abind <- function(..., along=N, rev.along=NULL, new.names=NULL,
             ## unset(dot.args) don't need dot.args any more, but R doesn't have unset()
         } else {
             arg.alt.names <- arg.names
-            arg.alt.names[arg.names==""] <- paste("X", seq(along=arg.names), sep="")[arg.names==""]
+            arg.alt.names[arg.names==""] <- paste("X", seq(along.with=arg.names), sep="")[arg.names==""]
         }
     } else {
         arg.alt.names <- arg.names
@@ -146,7 +146,7 @@ abind <- function(..., along=N, rev.along=NULL, new.names=NULL,
     ## The dimension order of arg.dim is original
     arg.dim <- matrix(integer(1), nrow=N, ncol=length(arg.names))
 
-    for (i in seq(len=length(arg.list))) {
+    for (i in seq(length.out=length(arg.list))) {
         m <- arg.list[[i]]
         m.changed <- FALSE
 
@@ -192,7 +192,7 @@ abind <- function(..., along=N, rev.along=NULL, new.names=NULL,
                 dimnames(m) <- NULL
             }
             arg.dim[,i] <- c(new.dim[pre], 1, new.dim[post])
-            if (any(perm!=seq(along=perm))) {
+            if (any(perm!=seq(along.with=perm))) {
                 dim(m) <- c(new.dim[pre], 1, new.dim[post])
                 m.changed <- TRUE
             }
@@ -201,7 +201,7 @@ abind <- function(..., along=N, rev.along=NULL, new.names=NULL,
                         N, " or ", N-1)
         }
 
-        if (any(perm!=seq(along=perm)))
+        if (any(perm!=seq(along.with=perm)))
             arg.list[[i]] <- aperm(m, perm)
         else if (m.changed)
             arg.list[[i]] <- m
@@ -209,7 +209,7 @@ abind <- function(..., along=N, rev.along=NULL, new.names=NULL,
 
     ## Make sure all arguments conform
     conform.dim <- arg.dim[,1]
-    for (i in seq(len=ncol(arg.dim))) {
+    for (i in seq(length.out=ncol(arg.dim))) {
         if (any((conform.dim!=arg.dim[,i])[-along])) {
             stop("arg '", arg.alt.names[i], "' has dims=", paste(arg.dim[,i], collapse=", "),
                  "; but need dims=", paste(replace(conform.dim, along, "X"), collapse=", "))
@@ -218,8 +218,8 @@ abind <- function(..., along=N, rev.along=NULL, new.names=NULL,
 
     ## find the last (or first) names for each dimensions except the join dimension
     if (N>1)
-        for (dd in seq(len=N)[-along]) {
-            for (i in (if (use.first.dimnames) seq(along=arg.names) else rev(seq(along=arg.names)))) {
+        for (dd in seq(length.out=N)[-along]) {
+            for (i in (if (use.first.dimnames) seq(along.with=arg.names) else rev(seq(along.with=arg.names)))) {
                 if (length(arg.dimnames[[dd,i]]) > 0) {
                     dimnames.new[[dd]] <- arg.dimnames[[dd,i]]
                     if (use.dnns && !is.null(arg.dnns[[dd,i]]))
@@ -230,7 +230,7 @@ abind <- function(..., along=N, rev.along=NULL, new.names=NULL,
         }
 
     ## find or create names for the join dimension
-    for (i in seq(len=length(arg.names))) {
+    for (i in seq(length.out=length(arg.names))) {
         ## only use names if arg i contributes some elements
         if (arg.dim[along,i] > 0) {
             dnm.along <- arg.dimnames[[along,i]]
@@ -247,7 +247,7 @@ abind <- function(..., along=N, rev.along=NULL, new.names=NULL,
                 else if (arg.names[i]=="")
                     dnm.along <- rep("", arg.dim[along,i])
                 else
-                    dnm.along <- paste(arg.names[i], seq(length=arg.dim[along,i]), sep="")
+                    dnm.along <- paste(arg.names[i], seq(length.out=arg.dim[along,i]), sep="")
             }
             dimnames.new[[along]] <- c(dimnames.new[[along]], dnm.along)
         }
@@ -274,13 +274,13 @@ abind <- function(..., along=N, rev.along=NULL, new.names=NULL,
                  dim=c( arg.dim[-along,1], sum(arg.dim[along,])),
                  dimnames=dimnames.new[perm])
     ## permute the output array to put the join dimension back in the right place
-    if (any(order(perm)!=seq(along=perm)))
+    if (any(order(perm)!=seq(along.with=perm)))
         out <- aperm(out, order(perm))
 
     ## if new.names is list of character vectors, use whichever are non-null
     ## for dimension names, checking that they are the right length
     if (!is.null(new.names) && is.list(new.names)) {
-        for (dd in seq(len=N)) {
+        for (dd in seq(length.out=N)) {
             if (!is.null(new.names[[dd]])) {
                 if (length(new.names[[dd]])==dim(out)[dd])
                     dimnames(out)[[dd]] <- new.names[[dd]]

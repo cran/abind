@@ -31,7 +31,7 @@ adrop.default <- function(x, drop=TRUE, named.vector=TRUE, one.d.array=FALSE, ..
     dim(x) <- NULL
     # can't use indexing like [-drop] because drop can be empty, and that
     # doesn't have the right semantics
-    keep <- setdiff(seq(len=length(x.dim)), drop)
+    keep <- setdiff(seq(length.out=length(x.dim)), drop)
     if (length(x.dim[keep])>1 || (length(x.dim[keep])==1 && one.d.array)) {
         # array result
         dim(x) <- x.dim[keep]

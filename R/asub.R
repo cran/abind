@@ -1,5 +1,5 @@
-asub <- function(x, idx, dims=seq(len=max(length(dim(x)), 1)), drop=NULL, ...) UseMethod("asub")
-asub.default <- function(x, idx, dims=seq(len=max(length(dim(x)), 1)), drop=NULL, ...) {
+asub <- function(x, idx, dims=seq(length.out=max(length(dim(x)), 1)), drop=NULL, ...) UseMethod("asub")
+asub.default <- function(x, idx, dims=seq(length.out=max(length(dim(x)), 1)), drop=NULL, ...) {
     # Do arbitrary indexing of x as positions in dims
     if (length(dims)>1 && !is.list(idx))
         stop("idx must be a list when length dims>1")
@@ -26,7 +26,7 @@ asub.default <- function(x, idx, dims=seq(len=max(length(dim(x)), 1)), drop=NULL
     } else {
         xic[[length(xic)]] <- drop
     }
-    for (i in seq(along=dims))
+    for (i in seq(along.with=dims))
         if (!is.null(idx[[i]]))
             xic[2+dims[i]] <- idx[i]
     return(eval(xic)) # , envir=parent.frame(), enclos=baseenv()))
